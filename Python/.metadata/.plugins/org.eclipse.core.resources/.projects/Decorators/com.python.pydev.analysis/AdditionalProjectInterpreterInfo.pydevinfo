@@ -1,0 +1,30 @@
+-- VERSION_4
+-- START DISKCACHE_2
+/Users/yili/Documents/Richard USB info/Learning_Code/Python/.metadata/.plugins/org.eclipse.core.resources/.projects/Decorators/com.python.pydev.analysis/v2_indexcache
+method_decorators|1472221236000000000|/Users/yili/Documents/Richard USB info/Learning_Code/Python/Decorators/Practice/method_decorators.py
+p_decorator|1472221248000000000|/Users/yili/Documents/Richard USB info/Learning_Code/Python/Decorators/Practice/p_decorator.py
+-- END DISKCACHE
+-- START DICTIONARY
+4
+2=method_decorators
+4=Person.__init__
+1=p_decorator
+3=Person
+-- END DICTIONARY
+-- START TREE 1
+7
+div|1|div_decorate!10@
+get|2|get_text!10@get_name!10@
+my_|3|my_get_text!11@my_get_text2!11@my_person!19@
+p_d|2|p_decorate!18@p_decorate!10@
+per|1|Person!17@
+tex|1|text!11@
+x|1|x!11@
+-- END TREE
+-- START TREE 2
+4
+__i|1|__init__!3&18@
+fam|1|family!4&19@
+get|1|get_fullname!3&18@
+nam|1|name!4&19@
+-- END TREE

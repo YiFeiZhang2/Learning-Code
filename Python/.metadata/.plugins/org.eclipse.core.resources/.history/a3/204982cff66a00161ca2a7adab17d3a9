@@ -1,0 +1,11 @@
+def p_decorate(func):
+    #def func_wrapper(name):
+    #    return "<p>{0}</p>".format(func(name))
+    return func
+
+def get_text(name):
+    return "Hi, my name is {0}.".format(name)
+
+my_get_text = p_decorate(get_text)
+
+print get_text("Richard")
