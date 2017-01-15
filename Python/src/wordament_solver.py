@@ -70,5 +70,10 @@ output = list(set(output))
 
 output_filtered = sorted([x for x in output if len(x) > 2], key=len, reverse=True)
 
-print(output_filtered)
+for i in range(len(output_filtered)):
+    if i%3 != 2:
+        print(output_filtered[i], end="\t\t\t\t")
+    else:
+        print(output_filtered[i])
+
 print("%s" % (time.time()-start_time))
