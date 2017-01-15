@@ -5,21 +5,35 @@ import copy
 import time
 
 dir = "/Users/yili/Documents/Richard USB info/Learning-Code/Python/english-words-master/"
-file1="words.txt"
-file2="words2.txt"
-file3="words3.txt"
+f_list=["dict_a.txt", "dict_b.txt", "dict_c.txt", "dict_d.txt", "dict_e.txt", "dict_f.txt", "dict_g.txt", "dict_h.txt", "dict_i.txt", "dict_j.txt", "dict_k.txt", "dict_l.txt", "dict_m.txt", "dict_n.txt", "dict_o.txt", "dict_p.txt", "dict_q.txt", "dict_r.txt", "dict_s.txt", "dict_t.txt", "dict_u.txt", "dict_v.txt", "dict_w.txt", "dict_x.txt", "dict_y.txt", "dict_z.txt"]
 
 word_list = [list(input()) for i in range (4)]
 
-f1 = open(os.path.join(dir, file1), 'r')
-word_dict1 = f1.read().split('\n')
+word_dict = []
+for i in range(len(f_list)):
+    f = open(os.path.join(dir, f_list[i]))
+    word_dict.append(f.read().split('\n'))
+    f.close()
+
+def bin_search(word, arr, hi, lo):
+    if (lo > hi):
+        return -1
+    else:
+        mid = (hi+lo) // 2
+        if word == arr[mid]:
+            return arr[mid]
+        elif word > arr[mid]:
+            return bin_search(word, arr, hi, mid+1)
+        else:
+            return bin_search(word, arr, mid-1, lo)
+  
 
 def solver (word_list, word_dict, path_list, i, j, used_ind):
     if (i < 0 or i > 3 or j < 0 or j > 3):
         return None
     elif ([i,j] in used_ind):
         return None
-    elif (len(path_list) > 4):
+    elif (len(path_list) > 7):
         return None
     else:
         to_solve = [[i+1, j+1], [i-1, j-1], [i-1, j+1], [i+1, j-1], [i+1, j], [i-1, j], [i, j+1], [i, j-1]]
@@ -32,10 +46,13 @@ def solver (word_list, word_dict, path_list, i, j, used_ind):
             if ans != None:
                 output_list.extend(ans)
         
-        curr_word = ''.join(path_list)
+        curr_word = ''.join(path_list).strip()
+        ind = ord(curr_word[0])-97
 
-        if  curr_word in word_dict:
-            output_list.append(curr_word)
+        found = bin_search(curr_word, word_dict[ind], len(word_dict[ind])-1, 0)
+
+        if (found != -1):
+            output_list.append(found)
 
         return output_list
 
@@ -45,7 +62,7 @@ start_time = time.time()
 
 for i in range(4):
     for j in range(4):
-        ans = solver (word_list, word_dict1, [], i, j, [])
+        ans = solver (word_list, word_dict, [], i, j, [])
         if ans != None:
             output.extend(ans)
 
