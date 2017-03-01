@@ -1,0 +1,1 @@
+[for c in System.Console.ReadLine() -> c] |> Set.ofList |> Set.toList |> List.iter (fun x -> printf "%c" x)
