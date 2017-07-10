@@ -3,6 +3,10 @@
 # The goal is to maximize the expected total reward
 # over x steps
 
+# Next steps: effect of optimistic initial values
+#             tracking non-stationary values
+#             changing step sizes
+
 import random
 import math
 
