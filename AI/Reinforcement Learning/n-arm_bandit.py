@@ -101,3 +101,4 @@ for i in range(time_steps):
         print('greedy ave reward at i = 1500 is ' + str(ave_reward(b_greed)))
         print('egreedy ave reward at i = 1500 is ' + str(ave_reward(b_egreed)))
         print('softmax ave reward at i = 1500 is ' + str(ave_reward(b_softmax)))
+        # print(b_egreed[0].num_pulls)
