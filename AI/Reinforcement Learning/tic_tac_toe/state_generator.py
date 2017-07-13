@@ -5,16 +5,6 @@ CIRCLE = 1
 CROSS = 2
 init_state = [0,0,0,0,0,0,0,0,0]
 
-# generates the list of resultant state after the player makes a move
-def genNextStates(arr, player):
-    states = []
-    for i in range(len(arr)):
-        if arr[i] == 0:
-            temp_arr = [x for x in arr]
-            temp_arr[i] = player
-            states.append(temp_arr)
-    return states
-
 # states where circle has next move
 circle_states = [[] for i in range(10)]
 circle_states[0] = [State(init_state)]

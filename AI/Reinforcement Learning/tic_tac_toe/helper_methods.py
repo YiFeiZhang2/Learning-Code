@@ -13,6 +13,16 @@ class State:
             for x in arr:
                 self.state.append(x)
 
+# generates the list of resultant state after the player makes a move
+def genNextStates(arr, player):
+    states = []
+    for i in range(len(arr)):
+        if arr[i] == 0:
+            temp_arr = [x for x in arr]
+            temp_arr[i] = player
+            states.append(temp_arr)
+    return states
+
 def rowComplete(state):
     rows = [0, 3, 6]
     for r in rows:
@@ -37,3 +47,14 @@ def diaComplete(state):
 
 def isComplete(state):
     return (rowComplete(state) or colComplete(state) or diaComplete(state))
+
+def binSearch(arr, s, e, obj):
+    if s > e:
+        return -1
+    m = Math.floor((s+e) / 2)
+    if obj == arr[m].state_num:
+        return m
+    elif obj < arr[m].state_num:
+        return binSearch(arr, s, m-1, obj)
+    else:
+        return binSearch(arr, m+1, e, obj)
