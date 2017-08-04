@@ -13,9 +13,11 @@ class Environment:
 
     # moves is the number of moves that has occured to reach the state
     def getReward (self, state, moves):
-        if state in self.states[moves]:
-            ind = self.states[moves].index(state)
-            return self.states[moves][ind].reward
+        for s in self.states[moves]:
+            if s.state == state:
+                ind = self.states[moves].index(s)
+                return self.states[moves][ind].reward
+        return -1
 
 class AgentValues:
     def __init__ (self, state_num, value, num_seen = 1):
@@ -43,6 +45,11 @@ class Agent:
         # Set the end value to be the reward (either 1 for winning, or -1 for losing)
         next_ind = binSearch(self.estimates, 0, len(self.estimates), game_states[-1])
         if next_ind != -1:
+            print('game state is')
+            print(game_states[-1])
+            print(turns)
+            print('reward is')
+            print(env.getReward(game_states[-1], turns))
             # Environment only stores +1 for a winning state, but such a state is a loss for the other player
             if last_move:
                 self.estimates[next_ind].value = env.getReward(game_states[-1], turns)
@@ -53,7 +60,7 @@ class Agent:
         game_length = len(game_states)
         for i in range(game_length-2, -1, -1):
             cur_ind = binSearch(self.estimates, 0, len(self.estimates), game_states[i])
-            self.estimates[cur_ind].value = self.estimates[cur_ind].value + (1 / self.estimates[cur_ind].num_seen) * (self.estimates[next_ind].value - self.estimates[cur_ind].value)
+            self.estimates[cur_ind].value = self.estimates[cur_ind].value + (1 / self.estimates[cur_ind].num_seen) #* (self.estimates[next_ind].value - self.estimates[cur_ind].value)
             next_ind = cur_ind
 
     # cur_state is the vector, represented by an array of characters
