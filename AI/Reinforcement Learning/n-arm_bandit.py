@@ -6,6 +6,7 @@
 # Next steps: effect of optimistic initial values
 #             tracking non-stationary values
 #             changing step sizes
+#             fix softmax
 
 import random
 import math
@@ -37,7 +38,8 @@ class Bandit:
         self.ave_reward = 0
 
     # choose one of the bandit's arm based on the method
-    def choose_arm(self, arms, e_val = 0.1, temp = 0.05, e = 2.718):
+    # with the softmax, as temp -> inf, policy -> random, and as temp -> 0, policy -> greedy
+    def choose_arm(self, arms, e_val = 0.1, temp = 0.1, e = 2.718):
         indices = max_indices(self.estimates)
         chosen_index = indices[random.randint(0, len(indices)-1)]
         if (self.method == 'e-greedy'):
@@ -50,12 +52,17 @@ class Bandit:
             denom = 0
             for i in range(len(arms)):
                 denom += math.pow(e, (self.estimates[i] / temp))
-            probs = [math.pow(e, (self.estimates[i] / temp)) / denom]
-            distr = [probs[i] if i == 0 else distr[i-1] + probs[i] for i in range(len(probs))]
+            probs = [math.pow(e, (self.estimates[i] / temp)) / denom for i in range(len(arms))]
+            distr = [0]*len(probs)
+            for i in range(len(probs)):
+                if i == 0:
+                    distr[i] = probs[i]
+                else:
+                    distr[i] = distr[i-1] + probs[i]
             # choose index
             p = random.random()
-            for i in range(len(arms)):
-                if p < arms[i] and (i == 0 or p > arms[i-1]):
+            for i in range(len(distr)):
+                if p < distr[i] and (i == 0 or p > distr[i-1]):
                     chosen_index = i
         return int(chosen_index)
 

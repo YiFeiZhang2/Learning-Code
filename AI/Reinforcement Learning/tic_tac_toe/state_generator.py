@@ -38,6 +38,12 @@ for x in range(0, 10):
             f.write(str(i))
         f.write(str(s.reward))
         f.write('|')
+    for s in circle_states[x]:
+        if x%2 == 1:
+            for i in s.state:
+                f.write(str(i))
+            f.write(str(s.reward))
+            f.write('|')
     f.write('\n')
         
 
