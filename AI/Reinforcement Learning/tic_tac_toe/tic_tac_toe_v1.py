@@ -1,7 +1,7 @@
 from helper_methods import *
 from random import random
 #from time import *
-state_file = 'config.txt'
+state_file = 'states.txt'
 CIRCLE = 1
 CROSS = 2
 temperature = 0.05
@@ -13,11 +13,11 @@ class Environment:
 
     # moves is the number of moves that has occured to reach the state
     def getReward (self, state, moves):
-        for s in self.states[moves]:
-            if s.state == state:
-                ind = self.states[moves].index(s)
-                return self.states[moves][ind].reward
-        return -1
+        states = self.states[moves]
+        for i in range(len(states)):
+            if states[i].state == state:
+                return self.states[moves][i].reward
+        return -100
 
 class AgentValues:
     def __init__ (self, state_num, value, num_seen = 1):
