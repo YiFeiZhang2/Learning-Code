@@ -2,6 +2,8 @@ from helper_methods import *
 from random import random
 #from time import *
 state_file = 'states.txt'
+circle_states = 'circle_values.txt'
+cross_states = 'cross_values.txt'
 CIRCLE = 1
 CROSS = 2
 temperature = 0.05
@@ -17,7 +19,7 @@ class Environment:
         for s in states:
             if s.state == state:
                 return s.reward
-        return -100
+        return 'life sucks'
 
 class AgentValues:
     def __init__ (self, state_num, value, num_seen = 1):
@@ -34,7 +36,7 @@ class Agent:
         self.estimates = []
         for line in init_estimates:
             for s in line:
-                self.estimates.append(AgentValues(int(s.state), 0))
+                self.estimates.append(AgentValues(int(s.state), 1))
         self.estimates.sort(key = lambda x: int(x.state_num))
 
     # Takes an array of the different positions that occured in the game, the end reward,
@@ -44,7 +46,8 @@ class Agent:
         # Set the end value to be the reward (either 1 for winning, or -1 for losing)
         next_ind = binSearch(self.estimates, 0, len(self.estimates), game_states[-1])
         if next_ind != -1:
-            print('game state is ' + str(game_states[-1]))
+            # print('game state is ' + str(game_states[-1]))
+
             # Environment only stores +1 for a winning state, but such a state is a loss for the other player
             # Winner gives reward of 2, losing gives reward of 0, tying vies 1
             if winner == self.player:
@@ -54,14 +57,14 @@ class Agent:
             else:
                 self.estimates[next_ind].value = 0
             
-            print('reward is ' + str(self.estimates[next_ind].value))
+            # print('reward is ' + str(self.estimates[next_ind].value))
 
-        print('at least we got this far')
+        # print('at least we got this far')
         game_length = len(game_states)
         for i in range(game_length-2, -1, -1):
             cur_ind = binSearch(self.estimates, 0, len(self.estimates), game_states[i])
             self.estimates[cur_ind].value = self.estimates[cur_ind].value + (1 / self.estimates[cur_ind].num_seen) * (self.estimates[next_ind].value - self.estimates[cur_ind].value)
-            print('values is ' + str(self.estimates[cur_ind].value))
+            # print('values is ' + str(self.estimates[cur_ind].value))
             next_ind = cur_ind
 
     # cur_state is the vector, represented by an array of characters
@@ -71,7 +74,7 @@ class Agent:
         # Action stores the index that will be chosen
         action = -1
         action_indices = [binSearch(self.estimates, 0, len(self.estimates), int(''.join([str(t) for t in s]))) for s in genNextStates(cur_state, self.player)]
-        print('action indices are: ' + str(action_indices))
+        # print('action indices are: ' + str(action_indices))
 
         denom = 0
         for i in action_indices:
@@ -88,6 +91,7 @@ class Agent:
             if p < distr[i] and (i == 0 or p > distr[i-1]):
                 action = action_indices[i]
 
+        self.estimates[action].num_seen += 1
         output_state = self.estimates[action].state_num
         return ('{0:09d}'.format(output_state))
 
@@ -108,37 +112,49 @@ E = Environment(all_state)
 B2 = Agent(all_state, CROSS)
 A1 = Agent(all_state, CIRCLE)
 
-# Keeps track of states that occured in this game for CIRCLE
-circle_game_states = []
-# Keeps track of states that occured in this game for CROSS
-cross_game_states = []
-cur_state = 0
-turn = 1
+# AI plays vs itself to learn
+for i in range(1000000):
+    # Keeps track of states that occured in this game for CIRCLE
+    circle_game_states = []
+    # Keeps track of states that occured in this game for CROSS
+    cross_game_states = []
+    cur_state = 0
+    turn = 1
 
-init_state = [0,0,0,0,0,0,0,0,0]
+    init_state = [0,0,0,0,0,0,0,0,0]
 
-# CIRCLE goes first
-cur_state = A1.choose(init_state)
-circle_game_states.append(int(cur_state))
-while (not isComplete(cur_state)):
-    turn += 1
-    if turn%2 == 1:
-        print('Circle Choose')
-        cur_state = A1.choose([int(x) for x in cur_state])
-        circle_game_states.append(int(cur_state))
-    else:
-        print('Cross Choose')
-        cur_state = B2.choose([int(x) for x in cur_state])
-        cross_game_states.append(int(cur_state))
-    print('cur state is: ' + cur_state)
+    # CIRCLE goes first
+    cur_state = A1.choose(init_state)
+    circle_game_states.append(int(cur_state))
+    while (not isComplete(cur_state)):
+        turn += 1
+        if turn%2 == 1:
+            # print('Circle Choose')
+            cur_state = A1.choose([int(x) for x in cur_state])
+            circle_game_states.append(int(cur_state))
+        else:
+            # print('Cross Choose')
+            cur_state = B2.choose([int(x) for x in cur_state])
+            cross_game_states.append(int(cur_state))
+        # print('cur state is: ' + cur_state)
 
-print(circle_game_states)
-print(cross_game_states)
+    # print(circle_game_states)
+    # print(cross_game_states)
 
 
-print('TIME TO LEARN!!')
-winner = getWinner(cur_state)
-print('winner is ' + str(winner))
-#If turn == odd, then CIRCLE made last move, thus won or tied
-A1.learn(circle_game_states, winner, E, turn)
-B2.learn(cross_game_states, winner, E, turn)
+    # print('TIME TO LEARN!!')
+    winner = getWinner(cur_state)
+    # print('winner is ' + str(winner))
+    #If turn == odd, then CIRCLE made last move, thus won or tied
+    A1.learn(circle_game_states, winner, E, turn)
+    B2.learn(cross_game_states, winner, E, turn)
+
+f = open(circle_states, 'w')
+for s in A1.estimates:
+    f.write(str(s.state_num) + ',' + str(s.value) + ',' + str(s.num_seen) + '\n')
+f.close()
+
+f = open(cross_states, 'w')
+for s in B2.estimates:
+    f.write(str(s.state_num) + ',' + str(s.value) + ',' + str(s.num_seen) + '\n')
+f.close()

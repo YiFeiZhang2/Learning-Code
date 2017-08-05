@@ -18,7 +18,6 @@ class State:
 
 # generates the list of resultant state after the player makes a move
 def genNextStates(arr, player):
-    print(arr)
     states = []
     for i in range(len(arr)):
         if arr[i] == 0:
