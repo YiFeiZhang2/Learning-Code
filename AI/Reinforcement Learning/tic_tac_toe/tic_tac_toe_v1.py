@@ -14,9 +14,9 @@ class Environment:
     # moves is the number of moves that has occured to reach the state
     def getReward (self, state, moves):
         states = self.states[moves]
-        for i in range(len(states)):
-            if states[i].state == state:
-                return self.states[moves][i].reward
+        for s in states:
+            if s.state == state:
+                return s.reward
         return -100
 
 class AgentValues:
@@ -39,28 +39,29 @@ class Agent:
 
     # Takes an array of the different positions that occured in the game, the end reward,
     # and updates the values associated for each position
-    # last_move is either True, which means that the Agent learning this made the last move (so won or tied)
     # or last_move is false, so the Agent must have lost or tied
-    def learn (self, game_states, last_move, env, turns):
+    def learn (self, game_states, winner, env, turns):
         # Set the end value to be the reward (either 1 for winning, or -1 for losing)
         next_ind = binSearch(self.estimates, 0, len(self.estimates), game_states[-1])
         if next_ind != -1:
-            print('game state is')
-            print(game_states[-1])
-            print(turns)
-            print('reward is')
-            print(env.getReward(game_states[-1], turns))
+            print('game state is ' + str(game_states[-1]))
             # Environment only stores +1 for a winning state, but such a state is a loss for the other player
-            if last_move:
-                self.estimates[next_ind].value = env.getReward(game_states[-1], turns)
+            # Winner gives reward of 2, losing gives reward of 0, tying vies 1
+            if winner == self.player:
+                self.estimates[next_ind].value = 2
+            elif winner == 0:
+                self.estimates[next_ind].value = 1
             else:
-                self.estimates[next_ind].value = env.getReward(game_states[-1], turns) * -1
+                self.estimates[next_ind].value = 0
+            
+            print('reward is ' + str(self.estimates[next_ind].value))
 
         print('at least we got this far')
         game_length = len(game_states)
         for i in range(game_length-2, -1, -1):
             cur_ind = binSearch(self.estimates, 0, len(self.estimates), game_states[i])
-            self.estimates[cur_ind].value = self.estimates[cur_ind].value + (1 / self.estimates[cur_ind].num_seen) #* (self.estimates[next_ind].value - self.estimates[cur_ind].value)
+            self.estimates[cur_ind].value = self.estimates[cur_ind].value + (1 / self.estimates[cur_ind].num_seen) * (self.estimates[next_ind].value - self.estimates[cur_ind].value)
+            print('values is ' + str(self.estimates[cur_ind].value))
             next_ind = cur_ind
 
     # cur_state is the vector, represented by an array of characters
@@ -136,6 +137,8 @@ print(cross_game_states)
 
 
 print('TIME TO LEARN!!')
+winner = getWinner(cur_state)
+print('winner is ' + str(winner))
 #If turn == odd, then CIRCLE made last move, thus won or tied
-A1.learn(circle_game_states, turn%2==1, E, turn)
-B2.learn(cross_game_states, turn%2==0, E, turn)
+A1.learn(circle_game_states, winner, E, turn)
+B2.learn(cross_game_states, winner, E, turn)
