@@ -1,6 +1,8 @@
 from helper_methods import *
-from tic_tac_toe_learn import *
+from agent import *
 init_state = '000000000'
+circle_values_file = 'circle_values.txt'
+cross_values_file = 'cross_values.txt'
 CIRCLE = 1
 CROSS = 2
 
@@ -52,9 +54,40 @@ def print_victory(state, player):
     else:
         print('Tied!')
 
+def ai_turn(agent, state):
+    print('AI turn')
+    action_indices = [binSearch(agent.estimates, 0, len(agent.estimates), int(''.join([str(t) for t in s]))) for s in genNextStates(state, agent.player)]
+    max_val = 0
+    action = -1
+    for i in action_indices:
+        if agent.estimates[i].value > max_val:
+            max_val = agent.estimates[i].value
+            action = i
+    next_state = agent.estimates[action].state_num
+    next_state = '{0:09d}'.format(next_state)
+    return next_state
 
-def h_vs_ai():
-    return 5
+
+def h_vs_ai(agent):
+    player = CROSS
+    cur_state = init_state
+    print_state(cur_state)
+    while not isComplete(cur_state):
+        player = switch_player(player)
+        if player == agent.player:
+            next_state = ai_turn(agent, cur_state)
+            cur_state = next_state
+            print_state(cur_state)
+        else:
+            if player == CIRCLE:
+                index = int(input('Circle\'s turn. Please enter 1-9 to choose a square\n'))
+            else:
+                index = int(input('Cross\'s turn. Please enter 1-9 to choose a square\n'))
+            while cur_state[index-1] != '0':
+                index = int(input('That spot is already taken. Choose another.\n'))
+            cur_state = human_update_state(cur_state, index, player)
+            print_state(cur_state)
+    print_victory(cur_state, player)
 
 def h_vs_h():
     player = CROSS
@@ -83,7 +116,16 @@ def init_game():
         elif game_type == '1':
             h_vs_h()
         elif game_type == '2':
-            print('2')
+            going_first = input("Press 1 to go first, press 2 to go second\n")
+            if going_first == '1':
+                f = open(cross_values_file, 'r')
+                info = f.readlines()
+                A = Agent(info, CROSS, False)
+            else:
+                f = open(circle_values_file, 'r')
+                info = f.readlines()
+                A = Agent(info, CIRCLE, False)
+            h_vs_ai(A)
         else:
             print("Your selection did not make sense.")
 

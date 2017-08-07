@@ -20,7 +20,7 @@ class State:
 def genNextStates(arr, player):
     states = []
     for i in range(len(arr)):
-        if arr[i] == 0:
+        if arr[i] == 0 or arr[i] == '0':
             temp_arr = [x for x in arr]
             temp_arr[i] = player
             states.append(temp_arr)
