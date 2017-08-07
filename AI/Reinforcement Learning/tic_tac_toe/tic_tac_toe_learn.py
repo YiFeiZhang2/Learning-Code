@@ -28,16 +28,22 @@ class AgentValues:
         self.num_seen = num_seen
 
 class Agent:
-    def __init__ (self, init_estimates, player):
+    # n represents whether the agent is new, or information is already in the initial estimates
+    def __init__ (self, init_estimates, player, n = True):
         # player value is either circle (1) or cross (2)
         self.player = player 
         # 9D array for the state s
         # Alternatively, juat one array
         self.estimates = []
-        for line in init_estimates:
-            for s in line:
-                self.estimates.append(AgentValues(int(s.state), 1))
-        self.estimates.sort(key = lambda x: int(x.state_num))
+        if n:
+            for line in init_estimates:
+                for s in line:
+                    self.estimates.append(AgentValues(int(s.state), 1))
+            self.estimates.sort(key = lambda x: int(x.state_num))
+        else:
+            for line in init_estimates:
+                info = list(map(int, line.split(',')))
+                self.estimates.append(AgentValues(info[0], info[1], info[2])
 
     # Takes an array of the different positions that occured in the game, the end reward,
     # and updates the values associated for each position

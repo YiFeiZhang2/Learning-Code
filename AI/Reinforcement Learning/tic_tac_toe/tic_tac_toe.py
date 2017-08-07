@@ -1,4 +1,5 @@
 from helper_methods import *
+from tic_tac_toe_learn import *
 init_state = '000000000'
 CIRCLE = 1
 CROSS = 2
