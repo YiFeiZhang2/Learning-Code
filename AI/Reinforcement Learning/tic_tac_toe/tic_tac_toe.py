@@ -110,6 +110,7 @@ def h_vs_h():
 def init_game():
     while True:
         game_type = input("Press 0 to exit the game, 1 for human vs human, or 2 for human vs AI\n")
+        print("1 is top left, 2 is top middle, and so on, with 9 being bottom right.")
 
         if game_type == '0':
             exit()
