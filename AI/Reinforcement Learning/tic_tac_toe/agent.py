@@ -1,3 +1,11 @@
+from helper_methods import *
+import math
+from random import random
+e = math.exp(1)
+CIRCLE = 1
+CROSS = 2
+temperature = 0.05
+
 class AgentValues:
     def __init__ (self, state_num, value, num_seen = 1):
         self.state_num = state_num
@@ -27,7 +35,7 @@ class Agent:
     # and updates the values associated for each position
     # or last_move is false, so the Agent must have lost or tied
     def learn (self, game_states, winner, env, turns):
-        # Set the end value to be the reward (either 1 for winning, or -1 for losing)
+        # Set the end value to be the reward (either 2 for winning, or 1 for losing)
         next_ind = binSearch(self.estimates, 0, len(self.estimates), game_states[-1])
         if next_ind != -1:
             # print('game state is ' + str(game_states[-1]))

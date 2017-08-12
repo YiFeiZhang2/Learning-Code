@@ -66,7 +66,7 @@ def getWinner(state):
     for c in cols:
         if state[c] != '0':
             if state[c] == state[c+3] == state[c+6] and state[c] != 0:
-                winner = state[r]
+                winner = state[c]
     if (state[0] == state[4] == state[8]) and state[0] != '0':
         winner = state[0]
     elif (state[2] == state[4] == state[6]) and state[4] != '0':

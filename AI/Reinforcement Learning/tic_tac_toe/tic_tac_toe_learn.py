@@ -7,8 +7,6 @@ circle_states = 'circle_values.txt'
 cross_states = 'cross_values.txt'
 CIRCLE = 1
 CROSS = 2
-temperature = 0.05
-e = 2.714
 
 class Environment:
     def __init__ (self, all_states):
