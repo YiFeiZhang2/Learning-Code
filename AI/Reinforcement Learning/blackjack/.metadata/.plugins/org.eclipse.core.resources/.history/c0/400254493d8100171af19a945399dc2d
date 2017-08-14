@@ -25,7 +25,7 @@ class State {
 	public int hashCode() {
 		String x = Integer.toString(this.card) + Integer.toString(this.val) 
 				+ Boolean.toString(this.usable);
-		return x.hashCode();
+		return (x.hashCode());
 	}
 	
 	State (Hand playerHand, Hand dealerHand){

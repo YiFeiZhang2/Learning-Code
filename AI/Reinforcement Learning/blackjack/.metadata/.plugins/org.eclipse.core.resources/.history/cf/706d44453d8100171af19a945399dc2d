@@ -21,13 +21,6 @@ class State {
 		return (this.card == o.card && this.val == o.val && this.usable == o.usable);
 	}
 	
-	@Override
-	public int hashCode() {
-		String x = Integer.toString(this.card) + Integer.toString(this.val) 
-				+ Boolean.toString(this.usable);
-		return x.hashCode();
-	}
-	
 	State (Hand playerHand, Hand dealerHand){
 		this.card = dealerHand.total;
 		this.val = playerHand.value();
