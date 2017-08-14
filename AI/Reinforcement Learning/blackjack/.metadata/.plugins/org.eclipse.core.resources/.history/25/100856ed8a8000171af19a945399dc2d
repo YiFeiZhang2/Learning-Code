@@ -1,0 +1,105 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+// An Ace is 1, but can be 11 if that does not make the hand bust
+// State S is a specific state of the dealer's shown card, player's value, and if they have a usable ace
+// Action A is either True (hit) or False (stay)
+public class BlackJackGame {
+	public static int randomCard (){
+		return ((int) (Math.random()*10) + 1);
+	}
+	
+	// returns an ArrayList of all possible States
+	public static ArrayList<State> getAllStates (){
+		ArrayList<State> states = new ArrayList<State>();
+		for (int card = 1; card < 11; card++){
+			Hand playerHand = new Hand();
+			Hand dealerHand = new Hand(card, (card == 1));
+			for (int firstPlayerCard = 1; firstPlayerCard < 11; firstPlayerCard ++){
+				for (int secondPlayerCard = 1; secondPlayerCard < 11; secondPlayerCard ++){
+					playerHand.addCard(firstPlayerCard);
+					playerHand.addCard(secondPlayerCard);
+				}
+			}
+			State state = new State(playerHand, dealerHand);
+			states.add(state);
+		}
+		return states;
+	}
+	
+	// Create the initial state-action -> value map for all state-action pairs
+	// Create the map such that it will have the initial policy of only sticking on 20 and 21
+	public static HashMap<StateActionPair, Double> initializeStateActionValueMap (){
+		HashMap<StateActionPair, Double> map = new HashMap<StateActionPair, Double>();
+		ArrayList<State> states = getAllStates();
+		for (State s : states) {
+			StateActionPair sapTrue = new StateActionPair(s, true);
+			if (sapTrue.state.val >= 20) {
+				map.put(sapTrue, -0.01);
+			} else {
+				map.put(sapTrue, 0.01);
+			}
+			StateActionPair sapFalse = new StateActionPair(s, false);
+			if (sapFalse.state.val >= 20) {
+				map.put(sapFalse, 0.01);
+			} else {
+				map.put(sapFalse, -0.01);
+			}
+		}
+		return map;
+	}
+	
+	// Create initial state-action -> count map for all state-action pairs
+	// count is the number of times the specific state-action has been encountered
+	public static HashMap<StateActionPair, Integer> initializeCountMap (){
+		HashMap<StateActionPair, Integer> map = new HashMap<StateActionPair, Integer>();
+		ArrayList<State> states = getAllStates();
+		for (State s : states) {
+			StateActionPair sapTrue = new StateActionPair(s, true);
+			StateActionPair sapFalse = new StateActionPair(s, false);
+			map.put(sapTrue, 0);
+			map.put(sapFalse, 0);
+		}
+		return map;
+	}
+	
+	public static State getRandomState (ArrayList<State> allStates){
+		int index = (int) (Math.random() * allStates.size());
+		return allStates.get(index);
+	}
+	
+	public static boolean getRandomAction (){
+		if (Math.random() < 0.5) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public 
+	
+	public static HashMap<StateActionPair, Double> MonteCarloES (int num){
+		ArrayList<State> allStates = getAllStates();
+		HashMap<StateActionPair, Double> Q = initializeStateActionValueMap();
+		HashMap<StateActionPair, Integer> count = initializeCountMap();
+		for (int i = 0; i < num; i++){
+			ArrayList<StateActionPair> episode = new ArrayList<StateActionPair>();
+			State curState = getRandomState(allStates);
+			boolean curAction = getRandomAction();
+			episode.add(new StateActionPair(curState, curAction));
+			
+			Hand playerHand = curState.getHand(true);
+			Hand dealerHand = curState.getHand(false);
+			while (curAction) {
+				
+			}
+			
+		}
+	}
+	
+	public static void main (String args[]){
+		Hand hand = new Hand();
+		for (int i = 0; i < 20; i++){
+			System.out.println(randomCard());
+		}
+	}
+}

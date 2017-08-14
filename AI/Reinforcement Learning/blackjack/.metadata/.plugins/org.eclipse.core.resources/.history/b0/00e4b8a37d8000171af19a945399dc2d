@@ -1,0 +1,47 @@
+import java.util.ArrayList;
+// An Ace is 1, but can be 11 if that does not make the hand bust
+// State S of the entire game
+class State {
+	/* card is the dealer's shown card
+	 * val is the total value of the player's hand
+	 * usable is whether the player has a usable ace
+	 */
+	int card;
+	int val;
+	boolean usable;
+	
+	State (int card, int val, boolean usable){
+		this.card = card;
+		this.val = val;
+		this.usable = usable;
+	}
+}
+
+// Hand represents either player's hand
+class Hand {
+	/* cards is a list of cards in hand
+	 * value is total value
+	 * ace represents whether the hand has an ace or not
+	 */
+	ArrayList<Integer> cards;
+	int value;
+	boolean ace;
+	
+	Hand (){
+		this.cards = new ArrayList<Integer>();
+		this.value = 0;
+		this.ace = false;
+	}
+	
+	public void addCard (int card){
+		this.cards.add(card);
+		this.value += card;
+		if (card == 1){
+			this.ace = true;
+		}
+	}
+	
+	public boolean hasUsableAce (){
+		return (this.ace && (this.value + 10 <= 21))
+	}
+}
