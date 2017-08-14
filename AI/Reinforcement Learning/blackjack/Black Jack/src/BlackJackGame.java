@@ -11,17 +11,11 @@ public class BlackJackGame {
 	// returns an ArrayList of all possible States
 	public static ArrayList<State> getAllStates (){
 		ArrayList<State> states = new ArrayList<State>();
-		for (int card = 1; card < 11; card++){
-			Hand playerHand = new Hand();
-			Hand dealerHand = new Hand(card, (card == 1));
-			for (int firstPlayerCard = 1; firstPlayerCard < 11; firstPlayerCard ++){
-				for (int secondPlayerCard = 1; secondPlayerCard < 11; secondPlayerCard ++){
-					playerHand.addCard(firstPlayerCard);
-					playerHand.addCard(secondPlayerCard);
-				}
+		for (int dealerCard = 1; dealerCard < 11; dealerCard++) {
+			for (int playerValue = 2; playerValue < 22; playerValue++) {
+				states.add(new State(dealerCard, playerValue, true));
+				states.add(new State(dealerCard, playerValue, false));
 			}
-			State state = new State(playerHand, dealerHand);
-			states.add(state);
 		}
 		return states;
 	}
@@ -75,33 +69,113 @@ public class BlackJackGame {
 		}
 	}
 	
-	public static void dealerTurn (){
+	// The policy is just the action that will give the highest value from the
+	// state-action -> value map
+	public static boolean selectAction (HashMap<StateActionPair, Double> ValueMap, State state){
+		StateActionPair sapTrue = new StateActionPair(state, true);
+		StateActionPair sapFalse = new StateActionPair(state, false);
+		for (StateActionPair k : ValueMap.keySet()) {
+			if (k.equals(sapTrue)) {
+				System.out.println("I have found it");
+				k.printSAP();
+				sapTrue.printSAP();
+				System.out.println(sapTrue.hashCode());
+				System.out.println(k.hashCode());
+				int x = sapTrue.hashCode();
+				System.out.println(x == k.hashCode());
+				System.out.println(ValueMap.get(sapTrue));
+				System.out.println(ValueMap.get(k));
+			}
+		}
 		
+		if (ValueMap.get(sapTrue) > ValueMap.get(sapFalse)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
+	// dealer will hit until reaching 17 or over
+	public static void dealerTurn (Hand dealerHand){
+		while (dealerHand.value() < 17) {
+			dealerHand.addCard(randomCard());
+		}
+	}
+	
+	public static double computeReward (Hand playerHand, Hand dealerHand){
+		// reward is 1 for winning, 0 for tieing, -1 for losing
+		double reward = 1;
+		if (playerHand.value() > 21) {
+			reward = -1;
+		} else {
+			if (playerHand.value() > dealerHand.value()) {
+				reward = 1;
+			} else if (playerHand.value() == dealerHand.value()) {
+				reward = 0;
+			} else {
+				reward = -1;
+			}
+		}
+		return reward;
+	}
+	
+	// Plays Black Jack num amount of times, with the AI learning via MonteCarloES
+	// ES - Exploring starts
 	public static HashMap<StateActionPair, Double> MonteCarloES (int num){
 		ArrayList<State> allStates = getAllStates();
-		HashMap<StateActionPair, Double> Q = initializeStateActionValueMap();
+		
+		// map from state-action to value
+		HashMap<StateActionPair, Double> valueMap = initializeStateActionValueMap();
+		// map from state-action to the number of times that particular state-action has been seen
 		HashMap<StateActionPair, Integer> count = initializeCountMap();
+		
+		System.out.println(valueMap.size());
+		
 		for (int i = 0; i < num; i++){
 			ArrayList<StateActionPair> episode = new ArrayList<StateActionPair>();
+			// Choose starting state and action randomly as part of exploring starts
 			State curState = getRandomState(allStates);
 			boolean curAction = getRandomAction();
 			episode.add(new StateActionPair(curState, curAction));
 			
 			Hand playerHand = curState.getHand(true);
 			Hand dealerHand = curState.getHand(false);
+			// while the player chooses the action of hitting
 			while (curAction) {
-				
+				playerHand.addCard(randomCard());
+				if (playerHand.value() > 21) {
+					break;
+				}
+				curState = new State(playerHand, dealerHand);
+				curAction = selectAction(valueMap, curState);
+				episode.add(new StateActionPair(curState, curAction));
 			}
 			
+			// dealer plays
+			dealerTurn(dealerHand);
+			// get reward form episode, no discounts
+			double reward = computeReward(playerHand, dealerHand);
+			// update value estimates for state-actions seen
+			for (StateActionPair sa : episode) {
+				System.out.println(sa.state);
+				
+				StateActionPair b = new StateActionPair(sa.state, sa.action);
+				System.out.println(sa.hashCode());
+				System.out.println(b.hashCode());
+				
+				int seenSoFar = count.get(sa);
+				
+				double averageValue = valueMap.get(sa);
+				count.put(sa, seenSoFar + 1);
+				valueMap.put(sa, averageValue + (reward - averageValue)/(seenSoFar + 1));
+			}
 		}
+		return valueMap;
 	}
 	
 	public static void main (String args[]){
-		Hand hand = new Hand();
-		for (int i = 0; i < 20; i++){
-			System.out.println(randomCard());
-		}
+		int numGames = 1000000;
+		System.out.println("MonteCarloES");
+		HashMap<StateActionPair, Double> Q = MonteCarloES(numGames);
 	}
 }

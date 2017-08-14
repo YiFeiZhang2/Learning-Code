@@ -17,6 +17,10 @@ class State {
 		this.usable = usable;
 	}
 	
+	public boolean equals(State o) {
+		return (this.card == o.card && this.val == o.val && this.usable == o.usable);
+	}
+	
 	State (Hand playerHand, Hand dealerHand){
 		this.card = dealerHand.total;
 		this.val = playerHand.value();
@@ -84,8 +88,23 @@ class StateActionPair {
 	State state;
 	boolean action;
 	
-	StateActionPair (State state, boolean action){
+	StateActionPair(State state, boolean action) {
 		this.state = state;
 		this.action = action;
+	}
+	
+	public void printSAP() {
+		System.out.println(state.card + " " + state.val + " " + state.usable + " " + this.action); 
+	}
+	
+	@Override
+	public int hashCode() {
+	    String x = Integer.toString(this.state.card) + Integer.toString(this.state.val) 
+	    			+ Boolean.toString(this.state.usable) + Boolean.toString(this.action);
+	    return x.hashCode();
+	}
+	
+	public boolean equals(StateActionPair o) {
+		return (this.action == o.action && this.state.equals(o.state));
 	}
 }
