@@ -146,7 +146,14 @@ public class BlackJackGame {
 			double reward = computeReward(playerHand, dealerHand);
 			// update value estimates for state-actions seen
 			for (StateActionPair sa : episode) {
+				System.out.println(sa.state);
+				
+				StateActionPair b = new StateActionPair(sa.state, sa.action);
+				System.out.println(sa.hashCode());
+				System.out.println(b.hashCode());
+				
 				int seenSoFar = count.get(sa);
+				
 				double averageValue = valueMap.get(sa);
 				count.put(sa, seenSoFar + 1);
 				valueMap.put(sa, averageValue + (reward - averageValue)/(seenSoFar + 1));

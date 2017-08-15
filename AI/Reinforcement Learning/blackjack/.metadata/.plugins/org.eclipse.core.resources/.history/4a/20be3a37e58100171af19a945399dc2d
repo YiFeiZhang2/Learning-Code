@@ -76,6 +76,22 @@ public class BlackJackGame {
 		StateActionPair sapTrue = new StateActionPair(state, true);
 		StateActionPair sapFalse = new StateActionPair(state, false);
 		
+		for (StateActionPair k : ValueMap.keySet()) {
+			if (k.equals(sapTrue)) {
+				System.out.println("I have found it");
+				k.printSAP();
+				sapTrue.printSAP();
+				System.out.println(sapTrue.hashCode());
+				System.out.println(k.hashCode());
+				System.out.println(sapTrue.hashCode() == k.hashCode());
+				System.out.println(k.equals(sapTrue));
+				System.out.println(sapTrue.equals(k));
+				System.out.println(ValueMap.get(k));
+				System.out.println(ValueMap.get(sapTrue));
+				
+			}
+		}
+		
 		if (ValueMap.get(sapTrue) > ValueMap.get(sapFalse)) {
 			return true;
 		} else {
@@ -146,7 +162,14 @@ public class BlackJackGame {
 			double reward = computeReward(playerHand, dealerHand);
 			// update value estimates for state-actions seen
 			for (StateActionPair sa : episode) {
+				System.out.println(sa.state);
+				
+				StateActionPair b = new StateActionPair(sa.state, sa.action);
+				System.out.println(sa.hashCode());
+				System.out.println(b.hashCode());
+				
 				int seenSoFar = count.get(sa);
+				
 				double averageValue = valueMap.get(sa);
 				count.put(sa, seenSoFar + 1);
 				valueMap.put(sa, averageValue + (reward - averageValue)/(seenSoFar + 1));

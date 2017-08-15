@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 // An Ace is 1, but can be 11 if that does not make the hand bust
 // State S is a specific state of the dealer's shown card, player's value, and if they have a usable ace
 // Action A is either True (hit) or False (stay)
@@ -75,6 +74,19 @@ public class BlackJackGame {
 	public static boolean selectAction (HashMap<StateActionPair, Double> ValueMap, State state){
 		StateActionPair sapTrue = new StateActionPair(state, true);
 		StateActionPair sapFalse = new StateActionPair(state, false);
+		for (StateActionPair k : ValueMap.keySet()) {
+			if (k.equals(sapTrue)) {
+				System.out.println("I have found it");
+				k.printSAP();
+				sapTrue.printSAP();
+				System.out.println(sapTrue.hashCode());
+				System.out.println(k.hashCode());
+				int x = sapTrue.hashCode();
+				System.out.println(x == k.hashCode());
+				System.out.println(ValueMap.get(sapTrue));
+				System.out.println(ValueMap.get(k));
+			}
+		}
 		
 		if (ValueMap.get(sapTrue) > ValueMap.get(sapFalse)) {
 			return true;
@@ -114,7 +126,6 @@ public class BlackJackGame {
 		
 		// map from state-action to value
 		HashMap<StateActionPair, Double> valueMap = initializeStateActionValueMap();
-		// Set<StateActionPair> x = valueMap.keySet();
 		// map from state-action to the number of times that particular state-action has been seen
 		HashMap<StateActionPair, Integer> count = initializeCountMap();
 		
@@ -146,7 +157,14 @@ public class BlackJackGame {
 			double reward = computeReward(playerHand, dealerHand);
 			// update value estimates for state-actions seen
 			for (StateActionPair sa : episode) {
+				System.out.println(sa.state);
+				
+				StateActionPair b = new StateActionPair(sa.state, sa.action);
+				System.out.println(sa.hashCode());
+				System.out.println(b.hashCode());
+				
 				int seenSoFar = count.get(sa);
+				
 				double averageValue = valueMap.get(sa);
 				count.put(sa, seenSoFar + 1);
 				valueMap.put(sa, averageValue + (reward - averageValue)/(seenSoFar + 1));
@@ -159,6 +177,5 @@ public class BlackJackGame {
 		int numGames = 1000000;
 		System.out.println("MonteCarloES");
 		HashMap<StateActionPair, Double> Q = MonteCarloES(numGames);
-		System.out.println(Q);
 	}
 }

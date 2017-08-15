@@ -17,13 +17,8 @@ class State {
 		this.usable = usable;
 	}
 	
-	@Override
-	public boolean equals(Object o) {
-		if (!(o instanceof State)) {
-			return false;
-		}
-		State s = (State) o;
-		return (this.card == s.card && this.val == s.val && this.usable == s.usable);
+	public boolean equals(State o) {
+		return (this.card == o.card && this.val == o.val && this.usable == o.usable);
 	}
 	
 	@Override
