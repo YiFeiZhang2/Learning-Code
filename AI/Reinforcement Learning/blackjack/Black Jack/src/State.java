@@ -76,6 +76,13 @@ class Hand {
 		this.ace = hasAce;
 	}
 	
+	public void printH() {
+		if (ace)
+			System.out.println("The total is " + this.total + " and a usable ace");
+		else
+			System.out.println("The total is " + this.total + " and no usable ace");
+	}
+	
 	public void addCard (int card){
 		this.total += card;
 		if (card == 1){

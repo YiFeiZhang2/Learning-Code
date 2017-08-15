@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.Scanner;
 // An Ace is 1, but can be 11 if that does not make the hand bust
 // State S is a specific state of the dealer's shown card, player's value, and if they have a usable ace
 // Action A is either True (hit) or False (stay)
@@ -155,10 +155,95 @@ public class BlackJackGame {
 		return valueMap;
 	}
 	
+	public static double[] BlackJack(HashMap<StateActionPair, Double> Q, Scanner sc) {
+		// initialize player, ai, and dealer's Hands
+		Hand playerHand = new Hand();
+		Hand aiHand = new Hand();
+		Hand dealerHand = new Hand();
+		// deal cards
+		playerHand.addCard(randomCard());
+		playerHand.addCard(randomCard());
+		aiHand.addCard(randomCard());
+		aiHand.addCard(randomCard());
+		dealerHand.addCard(randomCard());
+		// reveal dealer's card and player's cards
+		System.out.print("The dealer's cards: ");
+		dealerHand.printH();
+		System.out.print("Your cards: ");
+		playerHand.printH();
+		// give player choice of hitting or staying
+		System.out.println("Enter 'hit' to get another card, or 'stay' to keep your hand as is");
+		String choice = sc.next().trim().toLowerCase();
+		// keep hitting until player chooses to stay
+		while (!choice.equals("stay")) {
+			// make sure that the player's choice makes sense
+			while (!choice.equals("hit")) {
+				System.out.println("that is not a valid choice");
+				System.out.println("Enter 'hit' to get another card, or 'stay' to keep your hand as is");
+				choice = sc.next().trim().toLowerCase();
+			}
+			playerHand.addCard(randomCard());
+			System.out.print("Your cards: ");
+			playerHand.printH();
+			// check to see player's hand is still valid
+			if (playerHand.value() > 21) {
+				System.out.println("You have gone bust (>21 total). You lose.");
+				break;
+			}
+			System.out.println("Do you want to hit or stay?");
+			choice = sc.next().trim().toLowerCase();
+		}
+		// ai's turn
+		State curState = new State(aiHand, dealerHand);
+		boolean curAction = selectAction(Q, curState);
+		while (curAction) {
+			aiHand.addCard(randomCard());
+			if (aiHand.value() > 21) {
+				break;
+			}
+			curState = new State(aiHand, dealerHand);
+			curAction = selectAction(Q, curState);
+		}
+		// dealer's turn
+		dealerTurn(dealerHand);
+		double playerReward = computeReward(playerHand, dealerHand);
+		double aiReward = computeReward(aiHand, dealerHand);
+		System.out.println("Your reward is " + playerReward);
+		System.out.println("The ai's reward is " + aiReward);
+		double[] rewards = {playerReward, aiReward};
+		return rewards;
+	}
+	
+	
 	public static void main (String args[]){
 		int numGames = 1000000;
 		System.out.println("MonteCarloES");
 		HashMap<StateActionPair, Double> Q = MonteCarloES(numGames);
 		System.out.println(Q);
+		
+		// game of blackjack
+		double aiAveReward = 0;
+		double playerAveReward = 0;
+		int gameCount = 0;
+		double[] rewards;
+		System.out.println("1 for winning, 0 for tieing, -1 for losing, infinite cards");
+		System.out.println("0 to leave, 1 to start a game of Blackjack");
+		Scanner in = new Scanner(System.in);
+		String choice = in.next().trim();
+		while (!choice.equals("0")) {
+			if (!choice.equals("1")) {
+				System.out.println("Your choice did not make sense. Try again.");
+				choice = in.next().trim();
+			}
+			rewards = BlackJack(Q, in);
+			aiAveReward += (rewards[1] - aiAveReward)/(gameCount + 1);
+			playerAveReward += (rewards[0] - playerAveReward)/(gameCount + 1);
+			gameCount++;
+			System.out.println("Game over. 0 to leave, 1 to go again");
+			choice = in.next().trim();
+		}
+		in.close();
+		System.out.println("Your average reward is " + playerAveReward);
+		System.out.println("The Ai's average reward is " + aiAveReward);
 	}
 }
