@@ -100,9 +100,7 @@ public class BlackJackGame {
 				reward = -1;
 			}
 		} else {
-			if (dealerHand.value() > 21) {
-				reward = 1;
-			} else if (playerHand.value() > dealerHand.value()) {
+			if (playerHand.value() > dealerHand.value()) {
 				reward = 1;
 			} else if (playerHand.value() == dealerHand.value()) {
 				reward = 0;

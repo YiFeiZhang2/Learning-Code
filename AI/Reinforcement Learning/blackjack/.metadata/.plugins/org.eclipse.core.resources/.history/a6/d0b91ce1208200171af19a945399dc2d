@@ -94,15 +94,9 @@ public class BlackJackGame {
 		// reward is 1 for winning, 0 for tieing, -1 for losing
 		double reward = 1;
 		if (playerHand.value() > 21) {
-			if (dealerHand.value() > 21) {
-				reward = 0;
-			} else {
-				reward = -1;
-			}
+			reward = -1;
 		} else {
-			if (dealerHand.value() > 21) {
-				reward = 1;
-			} else if (playerHand.value() > dealerHand.value()) {
+			if (playerHand.value() > dealerHand.value()) {
 				reward = 1;
 			} else if (playerHand.value() == dealerHand.value()) {
 				reward = 0;
