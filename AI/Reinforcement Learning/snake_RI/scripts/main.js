@@ -1,5 +1,7 @@
 // ALL snakes are AI
 // How to import javascript?
+const MAX_TRACK_LENGTH = 50;
+const MAX_QUADRANTS = 16;
 
 var canvas = document.getElementById("backgroundCanvas");
 canvas.width = 750;
@@ -99,6 +101,98 @@ GameObject.prototype.hitObject = function (board, type = 'both', posx = this.pos
     return hit;
 }
 
+// determins the manhattan distance between x and the GameObject
+GameObject.prototype.manhattanDistance = function (x){
+    return Math.abs((this.posx - x.posx) + (this.posy - x.posy));
+}
+
+// determines the euclidian distance between x and the GameObject
+GameObject.prototype.euclidianDistance = function (x){
+    return Math.sqrt(Math.pow((this.posx - x.posx), 2) + Math.pow((this.posy - x.posy),2));
+}
+
+// gets direction vector between the instance and x
+// vector originates from the instance
+GameObject.prototype.getVector = function (x){
+    return [x.posx - this.posx, x.posy - this.posy];
+}
+
+// gets unit direction vector originating from GameObject instance and ending at x
+GameObject.prototype.getUnitVector = function (x){
+    var vector = this.getVector(x);
+    var dist = this.euclidianDistance(x);
+    return vector.map(x => x/dist);
+}
+
+// gets the direction quadrant of x relative to the GameObject
+GameObject.prototype.getDirection = function (x){
+    var unit_vector = this.getUnitVector(x);
+}
+
+function State(snake, food, board){
+    this.food_dir;
+    this.food_dist = snake.head.manhattanDistance(food);
+    this.sn_length = snake.length;
+    this.tail_dir;
+    this.valid_movements;
+}
+
+function Action(){
+
+}
+
+function StateActionPair(s, a){
+    this.state = s;
+    this.action = a;
+}
+
+var key = function(state_action){
+    var k = state_action.toString();
+}
+
+// Reinforcement learning stuff
+// A state is composed of:
+// Direction of food (quadrant), distance of food, snake length (capped at MAX_TRACK_LENGTH), direction of tail
+// Whether the snake is able to go in each of the 3 directions possible
+function Environment(){
+
+}
+
+
+// Board - subclass
+// 0 in board_arr means empty, 1 means food, 2 means snake
+function Board(){
+    this.colour = "#00000";
+    this.board_arr = new Array();
+    for (i = 0; i < this.y_range; i++){
+        this.board_arr[i] = [];
+        for (j = 0; j < this.x_range; j++){
+            this.board_arr[i][j] = 0;
+        }
+    }
+}
+
+// set up Board so it inherits from SnakeGame
+Board.prototype = Object.create(GameObject.prototype);
+Board.prototype.constructor = Board;
+
+Board.prototype.draw = function () {
+    ctx.fillStyle = this.colour;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+};
+
+Board.prototype.debugArr = function () {
+    ctx.fillStyle = "#FF6F50";
+    ctx.font = "8px Arial";
+    for (i = 0; i < this.y_range; i++) {
+        for (j = 0; j < this.x_range; j++) {
+            var txt = this.board_arr[i][j];
+
+            ctx.fillText(txt, 2 * j * this.unit_space + this.unit_space, 2 * i * this.unit_space + this.unit_space);
+        }
+    }
+}
+
 // Food - subclass - new Food also updates board array
 function Food(board) {
     this.colour = this.colours[5];
@@ -147,9 +241,9 @@ function Snake(colour_ind, board) {
     var self = this;
     this.colour = this.colours[colour_ind];
     this.is_alive = true;
-    this.length = 0;
+    this.length = 1;
     this.head = this.createHead(board);
-    this.tail;
+    this.tail = this.head;
     this.hit = 'unhit';
 };
 
